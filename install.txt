@@ -42,46 +42,6 @@ $sudo apt-get install screen  (screen bash ; ctrl a,d - run app in additional te
 //list all USB Devices
 $lsusb
 
-//list WLans
-$iwlist wlan0 scan
-
-//create a config file: mywpa.config
-$ sudo nano /etc/mywpa.config
-
-Now enter the following, save the file and exit back to the $ prompt (<Ctrl> O, <Ctrl< X)
-network={
-ssid="MyWLAN"
-proto=RSN
-key_mgmt=WPA-PSK
-pairwise=CCMP TKIP
-group=CCMP TKIP
-psk="MyKey"
-}
-
-//change your interface file to
-$ sudo nano /etc/network/interfaces
-
-auto lo
-
-iface lo inet loopback
-iface eth0 inet dhcp
-
-allow-hotplug wlan0
-
-auto wlan0
-iface wlan0 inet dhcp
-wpa-conf /etc/mywpa.config
-
-iface default inet dhcp
-
-
-//shutdown your raspberry and disconnect your LAN cable 
-$sudo shutdown -h now
-
-
-//check your WLAN Router for the new IP Adress and connect with putty
-
-
 
 
 /////////////////////////////
@@ -148,7 +108,7 @@ $exit
 
 
 
- 
+//I have never wondered beyond this line, LKB
 
 //////////////////////////////////////
 // run App with commandline options //
