@@ -508,7 +508,7 @@ int main(int argc, char *argv[]) {
     }
 
     Intro();
-
+//start reading wM-Bus
     //open wM-Bus Stick #1
     wMBUSStick = iM871AIdentifier;
     if (strlen(DevicePath))
@@ -516,12 +516,14 @@ int main(int argc, char *argv[]) {
     else
         sprintf(comDeviceName, "/dev/ttyUSB%d", Port);
 
+
     hStick = wMBus_OpenDevice(comDeviceName, wMBUSStick);
 
     if(hStick <= 0) { //try 2.Stick
         wMBUSStick = iAMB8465Identifier;
         usleep(500*1000);
         hStick = wMBus_OpenDevice(comDeviceName, wMBUSStick);
+        printf("stick not found");
     }
 
     if(hStick <= 0) {
