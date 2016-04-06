@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
         wMBUSStick = iAMB8465Identifier;
         usleep(500*1000);
         hStick = wMBus_OpenDevice(comDeviceName, wMBUSStick);
-        printf("stick not found");
+        printf("wM stick not found");
     }
 
     if(hStick <= 0) {
@@ -731,3 +731,4 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
+    
