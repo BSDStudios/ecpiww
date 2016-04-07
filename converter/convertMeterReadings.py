@@ -48,7 +48,7 @@ def XMLparser(XMLecpiLogFile):
   readingDates = [t.strftime("%Y-%m-%dT%H:%M:%S",dates) for dates in readingDates[::-1]] #reverse order as well
 
   # prepare data
-  consuption = [x - y for x, y in zip(readingValues[1:], readingValues[:-1])]
+  consuption = [y - x for x, y in zip(readingValues[1:], readingValues[:-1])]
   combinedReadings = zip(consuption,readingDates[:-1],readingValues[:-1],readingDates[1:],readingValues[1:])
   #print readings[1][0]
   return combinedReadings
@@ -85,7 +85,7 @@ def JSON_Usages(consuption,DateStart,readingStart,DateEnd,readingEnd,EnergyDescr
 # in: list ()
 def createReading(consumptionMatrix,meterType):
 
-  print consumptionMatrix
+  #print consumptionMatrix
   if (meterType == "Standard Electricity"):
     EnergyDescription = "Standard Electricity"
     meterType = 1
@@ -102,7 +102,7 @@ def createReading(consumptionMatrix,meterType):
     
   Usages = ""    
   for idx in consumptionMatrix:
-      print Usages
+      #print Usages
       Usages =  Usages + JSON_Usages(idx[0],idx[1],idx[2],idx[3],idx[4],EnergyDescription,meterType)
 
   EnergyUsage={
@@ -140,7 +140,6 @@ def createReading(consumptionMatrix,meterType):
 def main():
 
   FFreadings = XMLparser(inFile)
-  print "now JSON"
   JSON_output = createReading(FFreadings, "Standard Electricity")
   #print JSON_output
 
@@ -149,6 +148,10 @@ def main():
     outFile = open("%s.JSON" % inFile[:inFile.index('.')], "w")
   except ValueError: #if file has no extension
     outFile = open("%s.JSON" % inFile, "w") 
+
+#strip escape chara
+  JSON_output = "".join(e for e in JSON_output if (e<>'\\'))
+   #e.isalnum()) 
 
   outFile.write(JSON_output)
   outFile.close()
