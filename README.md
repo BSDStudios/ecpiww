@@ -35,6 +35,7 @@ At current stage code has:
 	* data is outputted in descending order
 	* in Jeremy code "Usages": have two field values, StartingTime and list of readings. I can't do it easly in python so for now it only output single field - list of readings
 
+
 [ ] check dual Usage field with Jeremy
 
 #ecpiww

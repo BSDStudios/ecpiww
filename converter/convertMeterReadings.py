@@ -5,6 +5,8 @@ import getopt
 
 import time as t
 import xml.etree.ElementTree as ET
+import json
+
 
 def usage():
     print "\nUsage: python %s -l [FF CamReader XML Log Data]\n" % os.path.basename(sys.argv[0])
@@ -47,16 +49,14 @@ def XMLparser(XMLecpiLogFile):
 
   # prepare data
   consuption = [x - y for x, y in zip(readingValues[1:], readingValues[:-1])]
-  # start, end, consuption, reading, reading
-  reading = zip(readingDates[:-1],consuption,readingDates[1:],readingValues[:-1],readingValues[1:])
-
-  return reading
-
+  combinedReadings = zip(consuption,readingDates[:-1],readingValues[:-1],readingDates[1:],readingValues[1:])
+  #print readings[1][0]
+  return combinedReadings
+# kwUsed, dateStart, readingStart, dateEnd, readEnd,
 
 #############################
 # JSON parser functions
 #############################
-
 def JSON_Reading(Reading,Date,Type):
   Reading = {
       "Reading":Reading,
@@ -73,26 +73,62 @@ def JSON_Usages(consuption,DateStart,readingStart,DateEnd,readingEnd,EnergyDescr
     },
     "KwhUsed":consuption,
     "StartReading":JSON_Reading(readingStart,DateStart,meterType),
-    "EndtReading": JSON_Reading(readingStart,DateEnd,meterType),
+    "EndReading": JSON_Reading(readingStart,DateEnd,meterType),
     "EnergyDescription":EnergyDescription
   }
-  return Usages
 
-# kwUsed, stReadingstReadingx2, endReadingx2,
+  output = json.dumps(Usages) 
+  #print (output)
+  return output
 
 # this is main function
 # in: list ()
-
 def createReading(consumptionMatrix,meterType):
-  JSONreading = {}
+
+  print consumptionMatrix
   if (meterType == "Standard Electricity"):
     EnergyDescription = "Standard Electricity"
     meterType = 1
+
+  #Std info about meter
+  Mpan = {"pc":217237189,
+  "mtc":1575355055,
+  "llfc":275683061,
+  "distributorid":20463572,
+  "uniqueid":695034916,
+  "checkdigit":431389205,
+  "state":2
+  }
+    
+  Usages = ""    
   for idx in consumptionMatrix:
-      JSONreading.update(JSON_Usages(idx[0],idx[1],idx[2],idx[3],idx[4],EnergyDescription,meterType))
+      print Usages
+      Usages =  Usages + JSON_Usages(idx[0],idx[1],idx[2],idx[3],idx[4],EnergyDescription,meterType)
 
+  EnergyUsage={
+      "Start": 1,#consumptionMatrix[0][1],
+      "End": 2,#consumptionMatrix[0][3],
+      "Usages":Usages
+  }
+
+  ElectricMeter={
+      'Mpan':Mpan,
+      'EnergyUsage':EnergyUsage,
+    'UniqueId' : "9e15f78c-14b7-4f01-81d4-80db67bb45db",
+    "Type" : {
+      "Description":"6 digit electricity meter",
+      "DecimalPlaces":1,
+      "Digits":6,
+      "Units":0,
+      "MaxReading":999999.9},
+    'SerialNum' : "AV3RNX1JBVMI",
+    'Latitude' : 51.4716939239492,
+    'Longitude' : -2.59810170396113,
+    'PostCode' : "BS6 7AR"
+  }
+
+  JSONreading = json.dumps(ElectricMeter)
   return JSONreading
-
 
 
 #############################
@@ -103,7 +139,20 @@ def createReading(consumptionMatrix,meterType):
 
 def main():
 
-  XMLparser(inFile)
+  FFreadings = XMLparser(inFile)
+  print "now JSON"
+  JSON_output = createReading(FFreadings, "Standard Electricity")
+  #print JSON_output
+
+  # write file
+  try:
+    outFile = open("%s.JSON" % inFile[:inFile.index('.')], "w")
+  except ValueError: #if file has no extension
+    outFile = open("%s.JSON" % inFile, "w") 
+
+  outFile.write(JSON_output)
+  outFile.close()
+
 
   return 0
 
